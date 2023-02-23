@@ -1,11 +1,13 @@
-package com.example.appmvvm.view
+package com.example.appmvvm.ui.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.example.appmvvm.databinding.ActivityMainBinding
-import com.example.appmvvm.viewmodel.QuoteViewModel
+import com.example.appmvvm.domain.GetQuotesUseCase
+import com.example.appmvvm.ui.viewmodel.QuoteViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -14,14 +16,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        quoteViewModel.quoteModel.observe(this, Observer { currentQuote ->
-            binding.tvQuote.text = currentQuote.quote
-            binding.tvAuthor.text = currentQuote.author
+        quoteViewModel.onCreate()
+        quoteViewModel.quoteModel.observe(this, Observer {
+            binding.tvQuote.text = it.quote
+            binding.tvAuthor.text = it.author
         })
-
-        binding.viewContainer.setOnClickListener {
-            quoteViewModel.randomQuote()
-        }
+        quoteViewModel.isLoading.observe(this, Observer {
+            binding.loading!!.isVisible = it
+        })
+        binding.viewContainer.setOnClickListener { quoteViewModel.randomQuote() }
     }
 }
